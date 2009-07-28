@@ -288,7 +288,7 @@ syn region perlTranslationGQ		matchgroup=perlMatchStartEnd start=+<+ end=+>[cds]
 syn region perlBrackets	start=+(+ end=+)+ contained transparent contains=perlBrackets,@perlStringSQ
 
 syn region perlStringUnexpanded	matchgroup=perlStringStartEnd start="'" end="'" contains=@perlInterpSQ
-syn region perlString		matchgroup=perlStringStartEnd start=+"+  end=+"+ contains=@perlInterpDQ
+syn region perlString		matchgroup=perlStringStartEnd start=+"+  end=+[\\]\@<!"+ contains=@perlInterpDQ
 
 " q()
 syn region perlQQ		matchgroup=perlStringStartEnd start=+\<q#+ end=+#+ contains=@perlInterpSQ
