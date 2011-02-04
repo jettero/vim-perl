@@ -1,12 +1,9 @@
 " Vim filetype plugin file
-" Language:      Perl 6
+" Language:      Perl
 " Maintainer:    Andy Lester <andy@petdance.com>
 " Homepage:      http://github.com/petdance/vim-perl
 " Bugs/requests: http://github.com/petdance/vim-perl/issues
-" Last Change:   2010-08-10
-" Contributors:  Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
-"
-" Based on ftplugin/perl.vim by Dan Sharp <dwsharp at hotmail dot com>
+" Last Change:   2009-08-14
 
 if exists("b:did_ftplugin") | finish | endif
 let b:did_ftplugin = 1
@@ -17,6 +14,8 @@ let s:save_cpo = &cpo
 set cpo-=C
 
 setlocal formatoptions+=crq
+setlocal keywordprg=perldoc\ -f
+
 setlocal comments=:#
 setlocal commentstring=#%s
 
@@ -35,15 +34,38 @@ setlocal includeexpr=substitute(substitute(v:fname,'::','/','g'),'$','.pm','')
 setlocal define=[^A-Za-z_]
 
 " The following line changes a global variable but is necessary to make
-" gf and similar commands work. Thanks to Andrew Pimlott for pointing out
-" the problem. If this causes a " problem for you, add an
-" after/ftplugin/perl6.vim file that contains
+" gf and similar commands work.  The change to iskeyword was incorrect.
+" Thanks to Andrew Pimlott for pointing out the problem. If this causes a
+" problem for you, add an after/ftplugin/perl.vim file that contains
 "       set isfname-=:
 set isfname+=:
 
+" Set this once, globally.
+if !exists("perlpath")
+    if executable("perl")
+      try
+	if &shellxquote != '"'
+	    let perlpath = system('perl -e "print join(q/,/,@INC)"')
+	else
+	    let perlpath = system("perl -e 'print join(q/,/,@INC)'")
+	endif
+	let perlpath = substitute(perlpath,',.$',',,','')
+      catch /E145:/
+	let perlpath = ".,,"
+      endtry
+    else
+	" If we can't call perl to get its path, just default to using the
+	" current directory and the directory of the current file.
+	let perlpath = ".,,"
+    endif
+endif
+
+let &l:path=perlpath
+"---------------------------------------------
+
 " Undo the stuff we changed.
-let b:undo_ftplugin = "setlocal fo< com< cms< inc< inex< def< isk<" .
-	    \         " | unlet! b:browsefilter"
+let b:undo_ftplugin = "setlocal fo< com< cms< inc< inex< def< isf< kp<" .
+	    \	      " | unlet! b:browsefilter"
 
 " Restore the saved compatibility options.
 let &cpo = s:save_cpo
